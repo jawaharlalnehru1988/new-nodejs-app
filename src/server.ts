@@ -8,7 +8,7 @@ import mongoose, { mongo } from 'mongoose';
 
 const app = express();
 
-const PORT = Environment.PORT || 3400;
+const PORT = Environment.PORT || 3600;
 const DB_URL = Environment.MONGODB_URI || 'mongodb://localhost:27017/referralDB';
 
 mongoose.connect(DB_URL

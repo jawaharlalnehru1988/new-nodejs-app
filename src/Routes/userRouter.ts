@@ -3,12 +3,12 @@ import { createUser, deleteUser, findUserByEmail, findUserByName, getAllUsers, g
 
 const userRouter = Router();
 
-userRouter.post('/users', createUser);
-userRouter.get('/users/:id', getUserById);
-userRouter.get('/users', getAllUsers);
-userRouter.put('/users/:id', updateUser);
-userRouter.delete('/users/:id', deleteUser);
-userRouter.get('/users/email', findUserByEmail);
-userRouter.get('/users/name', findUserByName);
+userRouter.post('/create', createUser);
+userRouter.get('/fetch/:id', getUserById);
+userRouter.get('/fetch', getAllUsers);
+userRouter.put('/update/:id', updateUser);
+userRouter.delete('/delete/:id', deleteUser);
+userRouter.get('/fetch/email', findUserByEmail);
+userRouter.get('/fetch/name', findUserByName);
 
 export default userRouter;
