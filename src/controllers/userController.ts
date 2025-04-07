@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import * as userService from '../services/userService';
+import {userService} from '../services/userService';
+import jwt from 'jsonwebtoken';
+import { Environment } from '../utils/config';
 
 export const createUser = async (req: Request, res: Response) => {
     try {
@@ -79,6 +81,22 @@ export const findUserByName = async (req: Request, res: Response) => {
              return;
         }
         res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+};
+
+export const loginUserController = async (req: Request, res: Response) => {
+    try {
+        const { email, password } = req.body;
+        const user = await userService.loginUser(email, password);
+        if (!user) {
+            res.status(401).json({ error: 'Invalid credentials' });
+            return;
+        }
+        const token = jwt.sign({ id: user._id }, Environment.JWT_SECRET as string, { expiresIn: '1h' });
+        res.status(200).json({ user, token });
+        // res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }

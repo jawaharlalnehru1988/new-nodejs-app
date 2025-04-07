@@ -1,9 +1,11 @@
 import User, { IUser } from '../models/user';
+import bcrypt from 'bcryptjs';
 
 
 export const createUser = async (userData: IUser) => {
   try {
-    const user = new User(userData);
+         const hashedPassword =   bcrypt.hash(userData.password, 10);
+    const user = new User({...userData, password: hashedPassword});
     return await user.save();
   } catch (error) {
     if (error instanceof Error) {
@@ -86,3 +88,37 @@ export const findUserByName = async (name: string) => {
         }
     }
 }
+
+export const loginUser = async (email: string, password: string) => {
+    try {
+       const user = await User.findOne({ email }).exec();
+        if (!user) {
+            throw new Error('User not found');
+           }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new Error('Invalid password');
+        }
+        return user;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error logging in user: ${error.message}`);
+        } else {
+            throw new Error('Error logging in user: Unknown error');
+        }
+        
+    }
+}
+
+export const userService = {
+    createUser,
+    getUserById,
+    getAllUsers,
+    updateUser,
+    deleteUser,
+    findUserByEmail,
+    findUserByName,
+    loginUser
+};
+
+export default userService;
