@@ -3,6 +3,6 @@ export enum Environment {
     Production = "production",
     Testing = "testing",
     JWT_SECRET = "REFERRALSECRECT",
-    MONGODB_URI = "mongodb+srv://nehru00123:Soundarya1994@harekrishna.iaouzqs.mongodb.net/Reffereal",
+    MONGODB_URI = 'mongodb://localhost:27017/referralDB',
     PORT = 3600,
 }

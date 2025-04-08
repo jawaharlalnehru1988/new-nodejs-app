@@ -4,12 +4,13 @@ import messageRouter from './Routes/messageRouter';
 import referralRouter from './Routes/refferalRouter';
 import appointmentRouter from './Routes/appointmentRouter';
 import { Environment } from './utils/config';
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
+import cors from 'cors';
 
 const app = express();
 
 const PORT = Environment.PORT || 3600;
-const DB_URL = Environment.MONGODB_URI || 'mongodb://localhost:27017/referralDB';
+const DB_URL = Environment.MONGODB_URI ;
 
 mongoose.connect(DB_URL
 ).then(() => {
@@ -19,6 +20,7 @@ mongoose.connect(DB_URL
 });
 
 app.use(express.json());
+app.use(cors())
 
 // Basic route
 app.get('/', (req, res) => {
@@ -36,3 +38,5 @@ app.use('/api/messages', messageRouter);
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+

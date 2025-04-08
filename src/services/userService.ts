@@ -1,20 +1,28 @@
 import User, { IUser } from '../models/user';
 import bcrypt from 'bcryptjs';
+import logger from '../utils/logger';
 
 
 export const createUser = async (userData: IUser) => {
-  try {
-         const hashedPassword =   bcrypt.hash(userData.password, 10);
-    const user = new User({...userData, password: hashedPassword});
-    return await user.save();
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Error creating user: ${error.message}`);
-    } else {
-      throw new Error('Error creating user: Unknown error');
+    logger.info('createUser called with userData:', userData);
+    try {
+      logger.debug('Hashing user password.');
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      logger.debug('Password hashed successfully.');
+      const user = new User({ ...userData, password: hashedPassword });
+      logger.debug('Creating new user document.');
+      const savedUser = await user.save();
+      logger.info('User created successfully with ID:', savedUser._id);
+      return savedUser;
+    } catch (error) {
+      logger.error('Error occurred during user creation:', error);
+      if (error instanceof Error) {
+        throw new Error(`Error creating user: ${error.message}`);
+      } else {
+        throw new Error('Error creating user: Unknown error');
+      }
     }
-  }
-};
+  };
 
 export const getUserById = async (userId: string) => {
     try {
@@ -89,26 +97,35 @@ export const findUserByName = async (name: string) => {
     }
 }
 
+
 export const loginUser = async (email: string, password: string) => {
+    logger.info('loginUser called with email:', email);
     try {
-       const user = await User.findOne({ email }).exec();
-        if (!user) {
-            throw new Error('User not found');
-           }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            throw new Error('Invalid password');
-        }
-        return user;
+      logger.debug('Searching for user by email:', email);
+      const user = await User.findOne({ email }).exec();
+      if (!user) {
+        logger.warn('User not found for email:', email);
+        throw new Error('User not found');
+      }
+      logger.debug('User found for email:', email, 'User ID:', user._id);
+  
+      logger.debug('Comparing provided password with stored hash.');
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        logger.warn('Invalid password provided for user:', email, 'User ID:', user._id);
+        throw new Error('Invalid password');
+      }
+      logger.info('User logged in successfully:', email, 'User ID:', user._id);
+      return user;
     } catch (error) {
-        if (error instanceof Error) {
-            throw new Error(`Error logging in user: ${error.message}`);
-        } else {
-            throw new Error('Error logging in user: Unknown error');
-        }
-        
+      logger.error('Error occurred during user login:', error);
+      if (error instanceof Error) {
+        throw new Error(`Error logging in user: ${error.message}`);
+      } else {
+        throw new Error('Error logging in user: Unknown error');
+      }
     }
-}
+  };
 
 export const userService = {
     createUser,
